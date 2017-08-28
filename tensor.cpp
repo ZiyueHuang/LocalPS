@@ -1,4 +1,4 @@
-#include<iostream>
+#include <iostream>
 
 typedef unsigned index_t;
 
@@ -53,7 +53,6 @@ struct Shape {
     
   template<int dim>
   friend std::ostream &operator<<(std::ostream &os, const Shape<dim> &shape);
-
 };
 
 
@@ -70,20 +69,19 @@ inline std::ostream &operator<<(std::ostream &os, const Shape<ndim> &shape) {
 }
 
 
-
 template<int dimension, typename DType>
 struct Tensor {
-
   static const int  kSubdim = dimension - 1;
   DType *dptr_;
   Shape<dimension> shape_;
 
   Tensor(void) : dptr_(nullptr) {}
+
   Tensor(const Shape<dimension> &shape)
       : shape_(shape), dptr_(nullptr) {}
+
   Tensor(DType *dptr, const Shape<dimension> &shape)
       : dptr_(dptr), shape_(shape) {}
-
 
   index_t size(index_t idx) const {
     return shape_[idx];
@@ -101,37 +99,39 @@ struct Tensor {
     dptr_ = exp.dptr_;
     shape_ = exp.shape_;
     return *this;
-  }
-  
+  }  
 };
 
 
 template<typename DType>
 struct Tensor<1, DType> {
-
   DType *dptr_;
   Shape<1> shape_;
   
   Tensor(void) : dptr_(nullptr) {}
+
   Tensor(const Shape<1> &shape)
       : shape_(shape), dptr_(nullptr) {}
+
   Tensor(DType *dptr, const Shape<1> &shape)
       : dptr_(dptr), shape_(shape) {}
 
   index_t size(index_t i) const {
     return shape_[0];
   }
+
   DType &operator[](index_t idx) {
     return dptr_[idx];
   }
+
   const DType &operator[](index_t idx) const {
     return dptr_[idx];
   }
+
   inline Tensor<1, DType> &
   operator=(const Tensor<1, DType> &exp) {
     dptr_ = exp.dptr_;
     shape_ = exp.shape_;
     return *this;
-  }
-  
+  }  
 };

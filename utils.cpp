@@ -1,11 +1,11 @@
-#include<mutex>
-#include<map>
-#include<queue>
-#include<omp.h>
+#include <mutex>
+#include <map>
+#include <queue>
+#include <omp.h>
 #include <condition_variable>
-#include<cassert>
-#include<iostream>
-#include<thread>
+#include <cassert>
+#include <iostream>
+#include <thread>
 
 template<typename T>
 class ThreadSafeQueue
@@ -56,8 +56,6 @@ bool ThreadSafeQueue<T>::Pop(T& popped_value) {
 }
 
 
-
-
 template<typename T>
 class ThreadSafeMap {
  public:
@@ -99,13 +97,14 @@ class ThreadSafeMap {
   std::map<int, T*> map_;
 };
 
+
 /*
 class test{
 public:
   static void push_thd(void *ptr){
-    test *ppp = (static_cast<test*>(ptr));
+    test *ptr = (static_cast<test*>(ptr));
     int i;
-    while((ppp->p).Pop(i)) std::cout<<i<<std::endl;
+    while((ptr->p).Pop(i)) std::cout<<i<<std::endl;
     std::cout<<"o"<<std::endl;
     
   }

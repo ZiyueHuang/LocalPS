@@ -30,7 +30,6 @@ void FreeSpace(Tensor<dim, DType>& src){
 }
 
 
-
 template<typename DType>
 class LocalModel {
  public:
@@ -38,6 +37,7 @@ class LocalModel {
     init_end = 0;
     destroy_signal = false;
   }
+
   ~LocalModel(void) {
     this->Destroy();
   }
@@ -55,8 +55,7 @@ class LocalModel {
       pull_map.Destroy();
 
       init_end = 0;
-    }
-    
+    }    
   }
   
   void PullWait(int key, int tid) {
@@ -66,7 +65,6 @@ class LocalModel {
     if (!w.finished) {
       std::unique_lock<std::mutex> wait_lock(wait_mutex);
       w.nwait += 1;
-      //std::cout<<"w"<<std::endl;  
       wait_cond.wait(wait_lock, [&]{return w.finished;});
       
       w.nwait -= 1;
@@ -97,7 +95,6 @@ class LocalModel {
     e.req[tid].ready = false;
      
     push_queue.Push(PullTask(data, key, tid));
-    //std::cout<<"f"<<std::endl; 
   }
 
   void PullReq(Tensor<2, DType> data, int key, int tid) {
@@ -198,6 +195,7 @@ class LocalModel {
       copied.resize(num_thread, false);
     }
   };
+
   struct PullReqRecord {
     bool ready;
     bool pending;
@@ -206,12 +204,14 @@ class LocalModel {
     PullReqRecord(void) : ready(false), pending(false) {
     }
   };
+
   struct PullWaitRecord {
     int nwait;
     bool finished;
     PullWaitRecord(void): nwait(0), finished(true) {
     }
   };
+
   struct PullEntry {
     Tensor<2, DType> src;
     std::vector<PullReqRecord> req;
@@ -219,6 +219,7 @@ class LocalModel {
     PullEntry(void) {
     }
   };
+
   bool destroy_signal;
 
   int num_thread;
@@ -227,9 +228,11 @@ class LocalModel {
   std::thread push_thread;
   std::mutex push_mutex;
   ThreadSafeMap<PushEntry> push_map;
+
   ThreadSafeQueue<std::pair<int, int>> pull_queue;
   ThreadSafeMap<PullEntry> pull_map;
   std::thread pull_thread;
+
   std::mutex request_mutex;
   std::mutex wait_mutex;
   std::condition_variable wait_cond;
@@ -241,7 +244,6 @@ class LocalModel {
       PullTask tsk;
       if (push_queue.Pop(tsk)) {
         const int tid = tsk.tid;
-        //std::cout<<"p"<<std::endl;
         PushEntry &e = push_map.GetRef(tsk.key);
         assert(e.data[0][0].shape_ == tsk.data.shape_);
         assert(!e.copied[tid]);
@@ -262,9 +264,7 @@ class LocalModel {
         if (push_finish) {
           this->HandlePushFinish(e.data[cp_version], tsk.key);
         }
-        //std::cout<<"c"<<std::endl;
       } else {
-        //std::cout<<"n"<<std::endl;
         assert(destroy_signal);
       }
     }
@@ -336,11 +336,11 @@ class LocalModel {
 };
 
 
-
 int main(){
   LocalModel<float> *localps = new LocalModel<float>();
   const int nthread = 2;
   localps->Init(nthread);
+
   Shape<2> s; s[0]=2; s[1]=2;
 
   Tensor<2, float> t1(s);
@@ -348,6 +348,7 @@ int main(){
   Tensor<2, float> t3(s);
   Tensor<2, float> t4(s);
   Tensor<2, float> t[2], tt[2];
+
   AllocSpace(t1);
   AllocSpace(t2);
   AllocSpace(t3);
@@ -369,6 +370,7 @@ int main(){
   }
 
   std::cout<<t3[1][0]<<std::endl;
+
   FreeSpace(t1);
   FreeSpace(t2);
   FreeSpace(t3);
